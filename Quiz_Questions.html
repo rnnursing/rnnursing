@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RN Nursing Admin</title>
+
+    <script src="https://www.gstatic.com/firebasejs/10.3.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.3.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+
+            apiKey: "AIzaSyC16rITZaL4l5Mkno7L0dJU1Gzv-V44Hn4",
+            authDomain: "rn-nursing-academy.firebaseapp.com",
+            projectId: "rn-nursing-academy",
+            storageBucket: "rn-nursing-academy.appspot.com",
+            databaseURL: "https://rn-nursing-academy-default-rtdb.firebaseio.com",
+            messagingSenderId: "1009949198085",
+            appId: "1:1009949198085:web:a8eaac70b6c75aa4ab996c",
+            measurementId: "G-101F88PPZT"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Get a reference to the Firebase database
+        var database = firebase.database();
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            document.querySelector('.container').classList.toggle('container-dark');
+            document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+                input.classList.toggle('dark-mode');
+            });
+            document.querySelector('button').classList.toggle('dark-mode-button');
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            margin-top: 50px;
+            transition: background-color 0.3s;
+        }
+
+        .container-dark {
+
+            background-color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+            margin-left: -10px;
+            background-color: #fff;
+            color: #333;
+        }
+
+        .dark-mode input[type="text"],
+        .dark-mode input[type="number"] {
+            background-color: #222;
+            color: #ddd;
+            border: 1px solid #2c2c2c;
+        }
+
+        button {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #333;
+            color: #fff;
+        }
+
+        .dark-mode {
+            background-color: #222;
+            color: #ddd;
+        }
+
+        .dark-mode-button {
+            background-color: #222222;
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="header">
+        <h1>RN Nursing Admin</h1>
+        <div id="messageContainer" background-color="#fff"></div>
+    </div>
+    <div class="container">
+        <form>
+            <div class="form-group">
+                <label for="question">Question:</label>
+                <input type="text" id="question" name="question" placeholder="Enter question">
+            </div>
+            <div class="form-group">
+                <label for="option1">Option 1:</label>
+                <input type="text" id="option1" name="option1" placeholder="Enter option 1">
+            </div>
+            <div class="form-group">
+                <label for="option2">Option 2:</label>
+                <input type="text" id="option2" name="option2" placeholder="Enter option 2">
+            </div>
+            <div class="form-group">
+                <label for="option3">Option 3:</label>
+                <input type="text" id="option3" name="option3" placeholder="Enter option 3">
+            </div>
+            <div class="form-group">
+                <label for="option4">Option 4:</label>
+                <input type="text" id="option4" name="option4" placeholder="Enter option 4">
+            </div>
+            <div class="form-group">
+                <label for="nextQuestionID">Next Question ID:</label>
+                <input type="text" id="nextQuestionID" name="nextQuestionID" placeholder="Enter next question ID">
+            </div>
+            <button class="button" type="submit">Create</button>
+        </form>
+    </div>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector("form");
+            const messageContainer = document.getElementById("messageContainer");
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // Prevent the default form submission behavior
+
+                // Get form values
+                const question = document.getElementById("question").value;
+                const option1 = document.getElementById("option1").value;
+                const option2 = document.getElementById("option2").value;
+                const option3 = document.getElementById("option3").value;
+                const option4 = document.getElementById("option4").value;
+                const nextQuestionID = document.getElementById("nextQuestionID").value;
+
+                // Create an object with the form data
+                const questionData = {
+                    question: question,
+                    options: {
+                        option1: option1,
+                        option2: option2,
+                        option3: option3,
+                        option4: option4
+                    },
+                    nextQuestionID: nextQuestionID
+                };
+
+                // Get a reference to the Firebase database
+                const database = firebase.database();
+
+                // Set the data under a new unique question ID
+                const newQuestionRef = database.ref("questions").push();
+                const newQuestionID = newQuestionRef.key;
+                console.log("About to send data: ", questionData);
+                newQuestionRef.set(questionData)
+                    .then(function () {
+                        console.log("Data successfully sent to Firebase");
+                        // Show success message
+                        messageContainer.textContent = "Data sent successfully!";
+                        setTimeout(function () {
+                            messageContainer.textContent = ""; // Clear the message after 5 seconds
+                        }, 5000);
+                    })
+                    .catch(function (error) {
+                        console.error("Error sending data to Firebase: ", error);
+                        // Show error message
+                        messageContainer.textContent = "Error sending data.";
+                        setTimeout(function () {
+                            messageContainer.textContent = ""; // Clear the message after 5 seconds
+                        }, 5000);
+                    });
+            });
+        });
+    </script>
+
+
+
+</body>
+
+</html>

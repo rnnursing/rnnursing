@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RN Nursing Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            transition: background-color 0.3s;
+        }
+
+        .header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            /* Center the cards horizontally */
+        }
+
+        .card {
+            width: 200px;
+            height: 200px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s, box-shadow 0.3s, color 0.3s;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 200px;
+        }
+
+        .card:hover {
+            transform: scale(1.1);
+            box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-content {
+            text-align: center;
+            transition: color 0.3s;
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #333;
+            color: #fff;
+        }
+
+        .dark-mode {
+            background-color: #222;
+            color: #ddd;
+        }
+
+        .dark-mode-card {
+            background-color: #3c3c3c;
+        }
+
+        .dark-mode-card-text {
+            background-color: #3c3c3c;
+            color: #ddd;
+            transition: color 0.3s;
+        }
+    </style>
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.classList.toggle('dark-mode-card');
+            });
+            const cardContents = document.querySelectorAll('.card-content');
+            cardContents.forEach(content => {
+                content.classList.toggle('dark-mode-card-text');
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div class="header">
+        <h1>RN Nursing Admin</h1>
+    </div>
+
+    <div class="cards-container">
+        <a href="Delete_Courses.html" class="card" style="text-decoration: none;color: #000;">
+            <div class="card-content">
+                Remove Courses
+            </div>
+        </a>
+        <a href="Delete_Lectures.html" class="card" style="text-decoration: none;color: #000;">
+            <div class="card-content">
+                Remove Lectures
+            </div>
+        </a>
+        <a href="Delete_Videos.html" class="card" style="text-decoration: none;color: #000;">
+            <div class="card-content">
+                Remove Videos
+            </div>
+        </a>
+        <a href="Delete_Quizzes.html" class="card" style="text-decoration: none;color: #000;">
+            <div class="card-content">
+                Remove Quizzes
+            </div>
+        </a>
+        <a href="Delete_Quiz_Question.html" class="card" style="text-decoration: none;color: #000;">
+            <div class="card-content">
+                Remove Quiz Questions
+            </div>
+        </a>
+    </div>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+</body>
+
+</html>
