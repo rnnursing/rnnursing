@@ -151,6 +151,10 @@
                     placeholder="Enter course description">
             </div>
             <div class="form-group">
+                <label for="courseImage">Course Image Link:</label>
+                <input type="text" id="courseImage" name="courseDescription" placeholder="Enter image link">
+            </div>
+            <div class="form-group">
                 <label for="totalLectures">Total Number of Lectures:</label>
                 <input type="number" id="totalLectures" name="totalLectures"
                     placeholder="Enter total number of lectures">
@@ -179,6 +183,7 @@
                 const courseName = document.getElementById("courseName").value;
                 const courseID = document.getElementById("courseID").value;
                 const courseDescription = document.getElementById("courseDescription").value;
+                const courseImage = document.getElementById("courseImage").value;
                 const totalLectures = parseInt(document.getElementById("totalLectures").value);
                 const totalHours = parseInt(document.getElementById("totalHours").value);
                 const totalVideos = parseInt(document.getElementById("totalVideos").value);
@@ -187,6 +192,7 @@
                 const courseData = {
                     courseName: courseName,
                     courseDescription: courseDescription,
+                    courseImage: courseImage,
                     totalLectures: totalLectures,
                     totalHours: totalHours,
                     totalVideos: totalVideos
