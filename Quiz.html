@@ -155,6 +155,11 @@
                 <input type="text" id="quizImage" name="quizImage" placeholder="Enter image link">
             </div>
             <div class="form-group">
+                <label for="courseID">Corresponding Course ID:</label>
+                <input type="text" id="courseID" name="courseID"
+                    placeholder="Enter the course id in which this quiz is to be displayed">
+            </div>
+            <div class="form-group">
                 <label for="startQuestionID">Start Question ID:</label>
                 <input type="text" id="startQuestionID" name="startQuestionID"
                     placeholder="Enter id of the first question to be displayed">
@@ -178,6 +183,7 @@
                 const quizID = document.getElementById("quizID").value;
                 const totalQuestions = parseInt(document.getElementById("totalQuestions").value);
                 const startQuestionID = parseInt(document.getElementById("startQuestionID").value);
+                const courseID = parseInt(document.getElementById("courseID").value);
                 const quizImage = document.getElementById("quizImage").value;
 
                 // Create an object with the form data
@@ -186,6 +192,7 @@
                     quizID: quizID,
                     totalQuestions: totalQuestions,
                     startQuestionID: startQuestionID,
+                    courseID: courseID,
                     quizImage: quizImage
                 };
 
