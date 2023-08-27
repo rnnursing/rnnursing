@@ -155,8 +155,9 @@
                 <input type="text" id="quizImage" name="quizImage" placeholder="Enter image link">
             </div>
             <div class="form-group">
-                <label for="questionID">Start Question ID:</label>
-                <input type="text" id="questionID" name="questionID" placeholder="Enter image link">
+                <label for="startQuestionID">Start Question ID:</label>
+                <input type="text" id="startQuestionID" name="startQuestionID"
+                    placeholder="Enter id of the first question to be displayed">
             </div>
             <button class="button" type="submit">Create</button>
         </form>
@@ -176,13 +177,15 @@
                 const quizName = document.getElementById("quizName").value;
                 const quizID = document.getElementById("quizID").value;
                 const totalQuestions = parseInt(document.getElementById("totalQuestions").value);
-                const questionID = parseInt(document.getElementById("questionID").value);
+                const startQuestionID = parseInt(document.getElementById("startQuestionID").value);
                 const quizImage = document.getElementById("quizImage").value;
 
                 // Create an object with the form data
                 const quizData = {
                     quizName: quizName,
+                    quizID: quizID,
                     totalQuestions: totalQuestions,
+                    startQuestionID: startQuestionID,
                     quizImage: quizImage
                 };
 
