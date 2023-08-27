@@ -172,7 +172,8 @@
             </div>
             <div class="form-group">
                 <label for="explanation">State The Explanation:</label>
-                <input type="text" id="explanation" name="explanation" placeholder="Enter the explanation for correct Answer">
+                <input type="text" id="explanation" name="explanation"
+                    placeholder="Enter the explanation for correct Answer">
             </div>
             <div class="form-group">
                 <label for="nextQuestionID">Next Question ID:</label>
@@ -206,12 +207,16 @@
                 // Create an object with the form data
                 const questionData = {
                     question: question,
+                    questionId: questionId,
+                    quizId: quizId,
                     options: {
                         option1: option1,
                         option2: option2,
                         option3: option3,
                         option4: option4
                     },
+                    correct: correct,
+                    explanation: explanation,
                     nextQuestionID: nextQuestionID
                 };
 
@@ -219,8 +224,7 @@
                 const database = firebase.database();
 
                 // Set the data under a new unique question ID
-                const newQuestionRef = database.ref("questions").push();
-                const newQuestionID = newQuestionRef.key;
+                const newQuestionRef = database.ref("questions/" + questionId);
                 console.log("About to send data: ", questionData);
                 newQuestionRef.set(questionData)
                     .then(function () {
