@@ -143,6 +143,10 @@
                 <input type="text" id="question" name="question" placeholder="Enter question">
             </div>
             <div class="form-group">
+                <label for="questionhindi">Question in Hindi:</label>
+                <input type="text" id="question" name="questionhindi" placeholder="Enter question in Hindi">
+            </div>
+            <div class="form-group">
                 <label for="question">Question ID:</label>
                 <input type="text" id="questionId" name="questionId" placeholder="Enter question ID">
             </div>
@@ -194,6 +198,7 @@
 
                 // Get form values
                 const question = document.getElementById("question").value;
+                const questionhindi = document.getElementById("questionhindi").value;
                 const questionId = document.getElementById("questionId").value;
                 const quizId = document.getElementById("quizId").value;
                 const option1 = document.getElementById("option1").value;
@@ -207,6 +212,7 @@
                 // Create an object with the form data
                 const questionData = {
                     question: question,
+                    questionhindi: questionhindi,
                     questionId: questionId,
                     quizId: quizId,
                     option1: option1,
