@@ -164,6 +164,10 @@
                 <input type="text" id="lectureCourseID" name="lectureCourseID"
                     placeholder="Enter course ID for this lecture">
             </div>
+            <div class="form-group">
+                <label for="lecturePremiumID">Is Lecture Premium:</label>
+                <input type="checkbox" id="lecturePremiumID" name="lecturePremiumID">
+            </div>
             <button class="button" type="submit">Create</button>
         </form>
     </div>
@@ -184,6 +188,7 @@
                 const lectureDescription = document.getElementById("lectureDescription").value;
                 const totalLectureVideos = parseInt(document.getElementById("totalLectureVideos").value);
                 const lectureCourseID = document.getElementById("lectureCourseID").value;
+                const lecturePremiumID = document.getElementById("lecturePremiumID").value;
 
                 // Create an object with the form data
                 const lectureData = {
@@ -191,7 +196,8 @@
                     lectureImage: lectureImage,
                     lectureDescription: lectureDescription,
                     totalLectureVideos: totalLectureVideos,
-                    lectureCourseID: lectureCourseID
+                    lectureCourseID: lectureCourseID,
+                    lecturePremiumID: lecturePremiumID
                 };
 
                 // Get a reference to the Firebase database
