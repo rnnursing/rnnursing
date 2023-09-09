@@ -146,6 +146,10 @@
                 <input type="text" id="quizID" name="quizID" placeholder="Enter quiz ID">
             </div>
             <div class="form-group">
+                <label for="time">Time in Minutes:</label>
+                <input type="number" id="time" name="time" placeholder="Enter Time to be given">
+            </div>
+            <div class="form-group">
                 <label for="totalQuestions">Total Questions:</label>
                 <input type="number" id="totalQuestions" name="totalQuestions"
                     placeholder="Enter total number of questions">
@@ -164,6 +168,10 @@
                 <input type="text" id="startQuestionID" name="startQuestionID"
                     placeholder="Enter id of the first question to be displayed">
             </div>
+            <div class="form-group">
+                <label for="quizPremiumID">Is Quiz Premium:</label>
+                <input type="checkbox" id="quizPremiumID" name="quizPremiumID">
+            </div>
             <button class="button" type="submit">Create</button>
         </form>
     </div>
@@ -181,19 +189,23 @@
                 // Get form values
                 const quizName = document.getElementById("quizName").value;
                 const quizID = document.getElementById("quizID").value;
+                const time = parseInt(document.getElementById("time").value);
                 const totalQuestions = parseInt(document.getElementById("totalQuestions").value);
-                const startQuestionID = document.getElementById("startQuestionID").value;
-                const courseID = document.getElementById("courseID").value;
+                const startQuestionID = parseInt(document.getElementById("startQuestionID").value);
+                const courseID = parseInt(document.getElementById("courseID").value);
                 const quizImage = document.getElementById("quizImage").value;
+                const quizPremiumID = document.getElementById("quizPremiumID").value;
 
                 // Create an object with the form data
                 const quizData = {
                     quizName: quizName,
                     quizID: quizID,
+                    time: time,
                     totalQuestions: totalQuestions,
                     startQuestionID: startQuestionID,
                     courseID: courseID,
-                    quizImage: quizImage
+                    quizImage: quizImage,
+                    quizPremiumID: quizPremiumID
                 };
 
                 // Get a reference to the Firebase database
