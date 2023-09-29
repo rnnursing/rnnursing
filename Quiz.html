@@ -127,6 +127,51 @@
         .dark-mode-button {
             background-color: #222222;
         }
+
+
+        .container2 {
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 30px;
+            margin-top: 50px;
+            transition: background-color 0.3s;
+            margin-left: 80px;
+            margin-right: 80px;
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
     </style>
 </head>
 
@@ -137,6 +182,8 @@
     </div>
     <div class="container">
         <form>
+            <button style="margin-bottom: 10px;" type="button" id="showButton">Fill data for editing using question
+                id</button>
             <div class="form-group">
                 <label for="quizName">Quiz Name:</label>
                 <input type="text" id="quizName" name="quizName" placeholder="Enter quiz name">
@@ -170,17 +217,136 @@
             </div>
             <div class="form-group">
                 <label for="quizPremiumID">Is Quiz Premium:</label>
-                <input type="checkbox" id="quizPremiumID" name="quizPremiumID">
+                <input type="checkbox" id="quizPremiumID" name="quizPremiumID" value="true"> Yes
             </div>
             <button class="button" type="submit">Create</button>
         </form>
     </div>
+
+    <div class="container2">
+        <h2>All Quizzes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Quiz ID</th>
+                    <th>Quiz Name</th>
+                    <th>Time (Minutes)</th>
+                    <th>Total Questions</th>
+                    <th>Start Question ID</th>
+                    <th>Corresponding Course ID</th>
+                    <th>Quiz Image</th>
+                    <th>Is Quiz Premium</th>
+                    <!-- Add other table headers here -->
+                </tr>
+            </thead>
+            <tbody id="quizTableBody">
+                <!-- Quiz data rows will be added here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
     <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
 
     <script>
+
+        // Function to display all quizzes in the table
+        function displayAllQuizzes() {
+            const quizTableBody = document.getElementById("quizTableBody");
+            quizTableBody.innerHTML = ""; // Clear previous data
+
+            // Get a reference to the Firebase database
+            const database = firebase.database();
+            const quizzesRef = database.ref("quizzes");
+
+            quizzesRef.once("value")
+                .then(function (snapshot) {
+                    snapshot.forEach(function (childSnapshot) {
+                        const quizData = childSnapshot.val();
+                        const quizID = childSnapshot.key;
+                        const row = quizTableBody.insertRow();
+
+                        // Populate table cells with quiz data
+                        const quizIDCell = row.insertCell(0);
+                        const quizNameCell = row.insertCell(1);
+                        const timeCell = row.insertCell(2);
+                        const totalQuestionsCell = row.insertCell(3);
+                        const startQuestionIDCell = row.insertCell(4);
+                        const courseIDCell = row.insertCell(5);
+                        const quizImageCell = row.insertCell(6);
+                        const quizPremiumCell = row.insertCell(7);
+
+                        quizIDCell.textContent = quizID;
+                        quizNameCell.textContent = quizData.quizName;
+                        timeCell.textContent = quizData.time;
+                        totalQuestionsCell.textContent = quizData.totalQuestions;
+                        startQuestionIDCell.textContent = quizData.startQuestionID;
+                        courseIDCell.textContent = quizData.courseID;
+                        quizImageCell.textContent = quizData.quizImage;
+                        quizPremiumCell.textContent = quizData.quizPremiumID;
+                    });
+                })
+                .catch(function (error) {
+                    console.error("Error fetching quiz data: ", error);
+                });
+        }
+
+        // Call the function to display quizzes when the page loads
+        document.addEventListener("DOMContentLoaded", function () {
+            displayAllQuizzes();
+        });
+
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.querySelector("form");
             const messageContainer = document.getElementById("messageContainer");
+            const showButton = document.getElementById("showButton");
+
+            showButton.addEventListener("click", function () {
+                const quizID = document.getElementById("quizID").value;
+
+                // Get a reference to the Firebase database
+                const database = firebase.database();
+
+                // Reference to the specific quiz in Firebase
+                const quizRef = database.ref("quizzes/" + quizID);
+
+                quizRef.once("value")
+                    .then(function (snapshot) {
+                        // Check if the quiz data exists
+                        if (snapshot.exists()) {
+                            // Retrieve the quiz data
+                            const quizData = snapshot.val();
+
+                            // Populate the form fields with the retrieved data
+                            document.getElementById("quizName").value = quizData.quizName;
+                            document.getElementById("time").value = quizData.time;
+                            document.getElementById("totalQuestions").value = quizData.totalQuestions;
+                            document.getElementById("startQuestionID").value = quizData.startQuestionID;
+                            document.getElementById("courseID").value = quizData.courseID;
+                            document.getElementById("quizImage").value = quizData.quizImage;
+                            document.getElementById("quizPremiumID").checked = quizData.quizPremiumID === "true";
+
+                            // Show success message
+                            messageContainer.textContent = "Quiz data retrieved successfully!";
+                            setTimeout(function () {
+                                messageContainer.textContent = ""; // Clear the message after 5 seconds
+                            }, 5000);
+                        } else {
+                            // Quiz data does not exist
+                            messageContainer.textContent = "Quiz data not found.";
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error("Error retrieving quiz data: ", error);
+                        // Show error message
+                        messageContainer.textContent = "Error retrieving quiz data.";
+                        setTimeout(function () {
+                            messageContainer.textContent = ""; // Clear the message after 5 seconds
+                        }, 5000);
+                    });
+            });
+
+
+
 
 
             form.addEventListener("submit", function (event) {
@@ -191,10 +357,10 @@
                 const quizID = document.getElementById("quizID").value;
                 const time = parseInt(document.getElementById("time").value);
                 const totalQuestions = parseInt(document.getElementById("totalQuestions").value);
-                const startQuestionID = parseInt(document.getElementById("startQuestionID").value);
-                const courseID = parseInt(document.getElementById("courseID").value);
+                const startQuestionID = document.getElementById("startQuestionID").value;
+                const courseID = document.getElementById("courseID").value;
                 const quizImage = document.getElementById("quizImage").value;
-                const quizPremiumID = document.getElementById("quizPremiumID").value;
+                const quizPremiumID = document.getElementById("quizPremiumID").checked;
 
                 // Create an object with the form data
                 const quizData = {
@@ -205,7 +371,7 @@
                     startQuestionID: startQuestionID,
                     courseID: courseID,
                     quizImage: quizImage,
-                    quizPremiumID: quizPremiumID
+                    quizPremiumID: quizPremiumID ? "true" : "false"
                 };
 
                 // Get a reference to the Firebase database

@@ -127,6 +127,51 @@
         .dark-mode-button {
             background-color: #222222;
         }
+
+
+        .container2 {
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 30px;
+            margin-top: 50px;
+            transition: background-color 0.3s;
+            margin-left: 80px;
+            margin-right: 80px;
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
     </style>
 </head>
 
@@ -138,6 +183,8 @@
     </div>
     <div class="container">
         <form>
+            <button style="margin-bottom: 10px;" type="button" id="showButton">Fill data for editing using question
+                id</button>
             <div class="form-group">
                 <label for="videoTitle">Video Title:</label>
                 <input type="text" id="videoTitle" name="videoTitle" placeholder="Enter video title">
@@ -161,12 +208,119 @@
             <button class="button" type="submit">Create</button>
         </form>
     </div>
+
+    <div class="container2">
+        <h2>All Videos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Video ID</th>
+                    <th>Video Title</th>
+                    <th>Corresponding Lecture ID</th>
+                    <th>Next Video ID</th>
+                    <th>YouTube Video ID</th>
+                    <!-- Add other table headers here -->
+                </tr>
+            </thead>
+            <tbody id="videoTableBody">
+                <!-- Video data rows will be added here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
     <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
 
     <script>
+
+        // Function to display all videos in the table
+        function displayAllVideos() {
+            const videoTableBody = document.getElementById("videoTableBody");
+            videoTableBody.innerHTML = ""; // Clear previous data
+
+            // Get a reference to the Firebase database
+            const database = firebase.database();
+            const videosRef = database.ref("videos");
+
+            videosRef.once("value")
+                .then(function (snapshot) {
+                    snapshot.forEach(function (childSnapshot) {
+                        const videoData = childSnapshot.val();
+                        const videoID = childSnapshot.key;
+                        const row = videoTableBody.insertRow();
+
+                        // Populate table cells with video data
+                        const videoIDCell = row.insertCell(0);
+                        const videoTitleCell = row.insertCell(1);
+                        const lectureIDCell = row.insertCell(2);
+                        const nextVideoIDCell = row.insertCell(3);
+                        const youtubeLinkCell = row.insertCell(4);
+
+                        videoIDCell.textContent = videoID;
+                        videoTitleCell.textContent = videoData.videoTitle;
+                        lectureIDCell.textContent = videoData.lectureID;
+                        nextVideoIDCell.textContent = videoData.nextVideoID;
+                        youtubeLinkCell.textContent = videoData.youtubeLink;
+                    });
+                })
+                .catch(function (error) {
+                    console.error("Error fetching video data: ", error);
+                });
+        }
+
+        // Call the function to display videos when the page loads
+        document.addEventListener("DOMContentLoaded", function () {
+            displayAllVideos();
+        });
+
+
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.querySelector("form");
             const messageContainer = document.getElementById("messageContainer");
+            const showButton = document.getElementById("showButton");
+
+            showButton.addEventListener("click", function () {
+                const videoID = document.getElementById("videoID").value;
+
+                // Get a reference to the Firebase database
+                const database = firebase.database();
+
+                // Reference to the specific video in Firebase
+                const videoRef = database.ref("videos/" + videoID);
+
+                videoRef.once("value")
+                    .then(function (snapshot) {
+                        // Check if the video data exists
+                        if (snapshot.exists()) {
+                            // Retrieve the video data
+                            const videoData = snapshot.val();
+
+                            // Populate the form fields with the retrieved data
+                            document.getElementById("videoTitle").value = videoData.videoTitle;
+                            document.getElementById("lectureID").value = videoData.lectureID;
+                            document.getElementById("nextVideoID").value = videoData.nextVideoID;
+                            document.getElementById("youtubeLink").value = videoData.youtubeLink;
+
+                            // Show success message
+                            messageContainer.textContent = "Video data retrieved successfully!";
+                            setTimeout(function () {
+                                messageContainer.textContent = ""; // Clear the message after 5 seconds
+                            }, 5000);
+                        } else {
+                            // Video data does not exist
+                            messageContainer.textContent = "Video data not found.";
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error("Error retrieving video data: ", error);
+                        // Show error message
+                        messageContainer.textContent = "Error retrieving video data.";
+                        setTimeout(function () {
+                            messageContainer.textContent = ""; // Clear the message after 5 seconds
+                        }, 5000);
+                    });
+            });
+
+
 
 
             form.addEventListener("submit", function (event) {

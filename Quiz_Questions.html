@@ -127,6 +127,51 @@
         .dark-mode-button {
             background-color: #222222;
         }
+
+
+        .container2 {
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 30px;
+            margin-top: 50px;
+            transition: background-color 0.3s;
+            margin-left: 80px;
+            margin-right: 80px;
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
     </style>
 </head>
 
@@ -138,13 +183,16 @@
     </div>
     <div class="container">
         <form>
+            <button style="margin-bottom: 10px;" type="button" id="showButton">Fill data for editing using question
+                id</button>
+
             <div class="form-group">
                 <label for="question">Question:</label>
                 <input type="text" id="question" name="question" placeholder="Enter question">
             </div>
             <div class="form-group">
                 <label for="questionhindi">Question in Hindi:</label>
-                <input type="text" id="question" name="questionhindi" placeholder="Enter question in Hindi">
+                <input type="text" id="questionhindi" name="questionhindi" placeholder="Enter question in Hindi">
             </div>
             <div class="form-group">
                 <label for="question">Question ID:</label>
@@ -186,12 +234,141 @@
             <button class="button" type="submit">Create</button>
         </form>
     </div>
+
+    <div class="container2">
+        <h2>All Questions</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Question ID</th>
+                    <th>Question</th>
+                    <th>Question in Hindi</th>
+                    <th>Quiz ID</th>
+                    <th>Option 1</th>
+                    <th>Option 2</th>
+                    <th>Option 3</th>
+                    <th>Option 4</th>
+                    <th>Correct Option Number</th>
+                    <th>Explanation</th>
+                    <th>Next Question ID</th>
+                    <!-- Add other table headers here -->
+                </tr>
+            </thead>
+            <tbody id="questionTableBody">
+                <!-- Question data rows will be added here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
     <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
 
     <script>
+
+        // Function to display all questions in the table
+        function displayAllQuestions() {
+            const questionTableBody = document.getElementById("questionTableBody");
+            questionTableBody.innerHTML = ""; // Clear previous data
+
+            // Get a reference to the Firebase database
+            const database = firebase.database();
+            const questionsRef = database.ref("questions");
+
+            questionsRef.once("value")
+                .then(function (snapshot) {
+                    snapshot.forEach(function (childSnapshot) {
+                        const questionData = childSnapshot.val();
+                        const questionID = childSnapshot.key;
+                        const row = questionTableBody.insertRow();
+
+                        // Populate table cells with question data
+                        const questionIDCell = row.insertCell(0);
+                        const questionCell = row.insertCell(1);
+                        const questionHindiCell = row.insertCell(2);
+                        const quizIDCell = row.insertCell(3);
+                        const option1Cell = row.insertCell(4);
+                        const option2Cell = row.insertCell(5);
+                        const option3Cell = row.insertCell(6);
+                        const option4Cell = row.insertCell(7);
+                        const correctOptionCell = row.insertCell(8);
+                        const explanationCell = row.insertCell(9);
+                        const nextQuestionIDCell = row.insertCell(10);
+
+                        questionIDCell.textContent = questionID;
+                        questionCell.textContent = questionData.question;
+                        questionHindiCell.textContent = questionData.questionhindi;
+                        quizIDCell.textContent = questionData.quizId;
+                        option1Cell.textContent = questionData.option1;
+                        option2Cell.textContent = questionData.option2;
+                        option3Cell.textContent = questionData.option3;
+                        option4Cell.textContent = questionData.option4;
+                        correctOptionCell.textContent = questionData.correct;
+                        explanationCell.textContent = questionData.explanation;
+                        nextQuestionIDCell.textContent = questionData.nextQuestionID;
+                    });
+                })
+                .catch(function (error) {
+                    console.error("Error fetching question data: ", error);
+                });
+        }
+
+        // Call the function to display questions when the page loads
+        document.addEventListener("DOMContentLoaded", function () {
+            displayAllQuestions();
+        });
+
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.querySelector("form");
             const messageContainer = document.getElementById("messageContainer");
+            const showButton = document.getElementById("showButton");
+
+            showButton.addEventListener("click", function () {
+                const questionID = document.getElementById("questionId").value;
+
+                // Get a reference to the Firebase database
+                const database = firebase.database();
+
+                // Reference to the specific question in Firebase
+                const questionRef = database.ref("questions/" + questionID);
+
+                questionRef.once("value")
+                    .then(function (snapshot) {
+                        // Check if the question data exists
+                        if (snapshot.exists()) {
+                            // Retrieve the question data
+                            const questionData = snapshot.val();
+
+                            // Populate the form fields with the retrieved data
+                            document.getElementById("question").value = questionData.question;
+                            document.getElementById("questionhindi").value = questionData.questionhindi;
+                            document.getElementById("quizId").value = questionData.quizId;
+                            document.getElementById("option1").value = questionData.option1;
+                            document.getElementById("option2").value = questionData.option2;
+                            document.getElementById("option3").value = questionData.option3;
+                            document.getElementById("option4").value = questionData.option4;
+                            document.getElementById("correct").value = questionData.correct;
+                            document.getElementById("explanation").value = questionData.explanation;
+                            document.getElementById("nextQuestionID").value = questionData.nextQuestionID;
+
+                            // Show success message
+                            messageContainer.textContent = "Question data retrieved successfully!";
+                            setTimeout(function () {
+                                messageContainer.textContent = ""; // Clear the message after 5 seconds
+                            }, 5000);
+                        } else {
+                            // Question data does not exist
+                            messageContainer.textContent = "Question data not found.";
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error("Error retrieving question data: ", error);
+                        // Show error message
+                        messageContainer.textContent = "Error retrieving question data.";
+                        setTimeout(function () {
+                            messageContainer.textContent = ""; // Clear the message after 5 seconds
+                        }, 5000);
+                    });
+            });
+
 
             form.addEventListener("submit", function (event) {
                 event.preventDefault(); // Prevent the default form submission behavior

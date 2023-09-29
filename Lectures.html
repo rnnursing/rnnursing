@@ -127,6 +127,53 @@
         .dark-mode-button {
             background-color: #222222;
         }
+
+
+
+
+        .container2 {
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 30px;
+            margin-top: 50px;
+            transition: background-color 0.3s;
+            margin-left: 80px;
+            margin-right: 80px;
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #333;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
     </style>
 </head>
 
@@ -137,6 +184,8 @@
     </div>
     <div class="container">
         <form>
+            <button style="margin-bottom: 10px;" type="button" id="showButton">Fill data for editing using question
+                id</button>
             <div class="form-group">
                 <label for="lectureTitle">Lecture Title:</label>
                 <input type="text" id="lectureTitle" name="lectureTitle" placeholder="Enter lecture title">
@@ -166,17 +215,132 @@
             </div>
             <div class="form-group">
                 <label for="lecturePremiumID">Is Lecture Premium:</label>
-                <input type="checkbox" id="lecturePremiumID" name="lecturePremiumID">
+                <input type="checkbox" id="lecturePremiumID" name="lecturePremiumID" value="true"> Yes
             </div>
             <button class="button" type="submit">Create</button>
         </form>
     </div>
+
+    <div class="container2">
+        <h2>All Lectures</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Lecture ID</th>
+                    <th>Lecture Title</th>
+                    <th>Lecture Description</th>
+                    <th>Lecture Image</th>
+                    <th>Is Lecture Premium</th>
+                    <th>Total Videos</th>
+                    <th>Corresponding Course ID</th>
+                    <!-- Add other table headers here -->
+                </tr>
+            </thead>
+            <tbody id="lectureTableBody">
+                <!-- Lecture data rows will be added here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
     <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
 
     <script>
+
+        // Function to display all lectures in the table
+        function displayAllLectures() {
+            const lectureTableBody = document.getElementById("lectureTableBody");
+            lectureTableBody.innerHTML = ""; // Clear previous data
+
+            // Get a reference to the Firebase database
+            const database = firebase.database();
+            const lecturesRef = database.ref("lectures");
+
+            lecturesRef.once("value")
+                .then(function (snapshot) {
+                    snapshot.forEach(function (childSnapshot) {
+                        const lectureData = childSnapshot.val();
+                        const lectureID = childSnapshot.key;
+                        const row = lectureTableBody.insertRow();
+
+                        // Populate table cells with lecture data
+                        const lectureIDCell = row.insertCell(0);
+                        const lectureTitleCell = row.insertCell(1);
+                        const lectureDescriptionCell = row.insertCell(2);
+                        const lectureImageCell = row.insertCell(3);
+                        const isPremiumCell = row.insertCell(4);
+                        const totalVideosCell = row.insertCell(5);
+                        const courseIDCell = row.insertCell(6);
+
+                        lectureIDCell.textContent = lectureID;
+                        lectureTitleCell.textContent = lectureData.lectureTitle;
+                        lectureDescriptionCell.textContent = lectureData.lectureDescription;
+                        lectureImageCell.textContent = lectureData.lectureImage;
+                        isPremiumCell.textContent = lectureData.lecturePremiumID;
+                        totalVideosCell.textContent = lectureData.totalLectureVideos;
+                        courseIDCell.textContent = lectureData.lectureCourseID;
+                    });
+                })
+                .catch(function (error) {
+                    console.error("Error fetching lecture data: ", error);
+                });
+        }
+
+        // Call the function to display lectures when the page loads
+        document.addEventListener("DOMContentLoaded", function () {
+            displayAllLectures();
+        });
+
+
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.querySelector("form");
             const messageContainer = document.getElementById("messageContainer");
+            const showButton = document.getElementById("showButton");
+
+
+            showButton.addEventListener("click", function () {
+                const lectureID = document.getElementById("lectureID").value;
+
+                // Get a reference to the Firebase database
+                const database = firebase.database();
+
+                // Reference to the specific lecture in Firebase
+                const lectureRef = database.ref("lectures/" + lectureID);
+
+                lectureRef.once("value")
+                    .then(function (snapshot) {
+                        // Check if the lecture data exists
+                        if (snapshot.exists()) {
+                            // Retrieve the lecture data
+                            const lectureData = snapshot.val();
+
+                            // Populate the form fields with the retrieved data
+                            document.getElementById("lectureTitle").value = lectureData.lectureTitle;
+                            document.getElementById("lectureImage").value = lectureData.lectureImage;
+                            document.getElementById("lectureDescription").value = lectureData.lectureDescription;
+                            document.getElementById("totalLectureVideos").value = lectureData.totalLectureVideos;
+                            document.getElementById("lectureCourseID").value = lectureData.lectureCourseID;
+                            document.getElementById("lecturePremiumID").value = lectureData.lecturePremiumID;
+
+                            // Show success message
+                            messageContainer.textContent = "Lecture data retrieved successfully!";
+                            setTimeout(function () {
+                                messageContainer.textContent = ""; // Clear the message after 5 seconds
+                            }, 5000);
+                        } else {
+                            // Lecture data does not exist
+                            messageContainer.textContent = "Lecture data not found.";
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error("Error retrieving lecture data: ", error);
+                        // Show error message
+                        messageContainer.textContent = "Error retrieving lecture data.";
+                        setTimeout(function () {
+                            messageContainer.textContent = ""; // Clear the message after 5 seconds
+                        }, 5000);
+                    });
+            });
+
 
             form.addEventListener("submit", function (event) {
                 event.preventDefault(); // Prevent the default form submission behavior
@@ -188,7 +352,7 @@
                 const lectureDescription = document.getElementById("lectureDescription").value;
                 const totalLectureVideos = parseInt(document.getElementById("totalLectureVideos").value);
                 const lectureCourseID = document.getElementById("lectureCourseID").value;
-                const lecturePremiumID = document.getElementById("lecturePremiumID").value;
+                const lecturePremiumID = document.getElementById("lecturePremiumID").checked;
 
                 // Create an object with the form data
                 const lectureData = {
@@ -197,7 +361,7 @@
                     lectureDescription: lectureDescription,
                     totalLectureVideos: totalLectureVideos,
                     lectureCourseID: lectureCourseID,
-                    lecturePremiumID: lecturePremiumID
+                    lecturePremiumID: lecturePremiumID ? "true" : "false"
                 };
 
                 // Get a reference to the Firebase database

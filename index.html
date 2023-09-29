@@ -6,6 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RN Nursing Admin - Login</title>
 
+    <script src="https://www.gstatic.com/firebasejs/10.3.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.3.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+
+            apiKey: "AIzaSyC16rITZaL4l5Mkno7L0dJU1Gzv-V44Hn4",
+            authDomain: "rn-nursing-academy.firebaseapp.com",
+            projectId: "rn-nursing-academy",
+            storageBucket: "rn-nursing-academy.appspot.com",
+            databaseURL: "https://rn-nursing-academy-default-rtdb.firebaseio.com",
+            messagingSenderId: "1009949198085",
+            appId: "1:1009949198085:web:a8eaac70b6c75aa4ab996c",
+            measurementId: "G-101F88PPZT"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Get a reference to the Firebase database
+        var database = firebase.database();
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            document.querySelector('.container').classList.toggle('container-dark');
+            document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+                input.classList.toggle('dark-mode');
+            });
+            document.querySelector('button').classList.toggle('dark-mode-button');
+        }
+    </script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -91,22 +124,37 @@
             const loginForm = document.getElementById("loginForm");
             const invalidLoginMessage = document.getElementById("invalidLoginMessage");
 
-            loginForm.addEventListener("submit", function (event) {
+            loginForm.addEventListener("submit", async function (event) {
                 event.preventDefault(); // Prevent the default form submission behavior
 
                 const username = document.getElementById("username").value;
                 const password = document.getElementById("password").value;
 
-                // Check if the username and password match a certain value
-                if (username === "rnnursing" && password === "123456") {
-                    // Redirect to the next page
-                    window.location.href = "Add_Options.html";
-                } else {
-                    invalidLoginMessage.textContent = "Invalid username or password.";
-                }
+                // Reference to the Firebase Realtime Database
+                const database = firebase.database();
+                const adminRef = database.ref("Admin");
+
+                adminRef.once("value")
+                    .then(function (snapshot) {
+                        const adminData = snapshot.val();
+                        const adminUsername = adminData.username;
+                        const adminPassword = adminData.password;
+
+                        // Check if the provided username and password match the database
+                        if (username == adminUsername && password == adminPassword) {
+                            // Redirect to the next page upon successful login
+                            window.location.href = "Add_Options.html";
+                        } else {
+                            invalidLoginMessage.textContent = "Invalid username or password.";
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error("Error retrieving admin data: ", error);
+                    });
             });
         });
     </script>
+
 </body>
 
 </html>
